@@ -237,3 +237,70 @@ def release_lock(lock_file):
 - [ ] 결과물 저장 확인
 - [ ] experiments_log.md 업데이트
 - [ ] 다음 에이전트를 위한 상태 메모
+
+## 9. Git/GitHub 커밋 가이드
+
+### 9.1 리포지토리 정보
+- **URL**: https://github.com/HRuaudi/diffusion_test
+- **브랜치**: master
+- **인증**: gh CLI (GitHub CLI)
+
+### 9.2 커밋 명령어
+```bash
+# 상태 확인
+cd D:/Diffusion_test && git status
+
+# 변경사항 스테이징
+git add .
+
+# 커밋 (간단한 메시지)
+git commit -m "메시지"
+
+# 푸시
+git push origin master
+```
+
+### 9.3 커밋 메시지 규칙
+```
+<type>: <subject>
+
+# type 종류
+feat:     새 기능
+fix:      버그 수정
+docs:     문서 수정
+refactor: 리팩토링
+test:     테스트 추가
+chore:    설정/빌드 변경
+
+# 예시
+feat: add data loader for HDF5
+fix: handle missing values in input
+docs: update experiment log
+```
+
+### 9.4 gh CLI 명령어
+```bash
+# 인증 상태 확인
+"C:/Program Files/GitHub CLI/gh.exe" auth status
+
+# 리포지토리 상태 확인
+"C:/Program Files/GitHub CLI/gh.exe" repo view
+
+# PR 생성
+"C:/Program Files/GitHub CLI/gh.exe" pr create --title "제목" --body "내용"
+```
+
+### 9.5 .gitignore 주요 항목
+| 패턴 | 설명 |
+|------|------|
+| `sandbox/` | AI 생성 임시 코드 |
+| `data/raw/*.h5` | HDF5 데이터 파일 |
+| `experiments/` | 실험 결과 |
+| `*.ckpt` | 체크포인트 |
+| `.venv/` | 가상환경 |
+
+### 9.6 커밋 전 체크리스트
+- [ ] `git status`로 변경 파일 확인
+- [ ] 민감 정보(API 키 등) 제외 확인
+- [ ] .gitignore 대상 파일 제외 확인
+- [ ] 커밋 메시지 규칙 준수

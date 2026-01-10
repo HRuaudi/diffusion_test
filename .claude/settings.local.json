@@ -11,7 +11,10 @@
       "Bash(\"C:/Program Files/GitHub CLI/gh.exe\" auth status)",
       "Bash(git init:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(\"C:/Program Files/GitHub CLI/gh.exe\" repo create Diffusion_test --public --source=. --remote=origin --push)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)"
     ]
   }
 }
