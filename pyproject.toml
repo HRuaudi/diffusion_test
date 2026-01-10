@@ -1,0 +1,37 @@
+[project]
+name = "your-project"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  # --- Core DL ---
+  "torch==2.9.1",
+  "torchvision==0.24.1",
+  "torchaudio==2.9.1",
+  "lightning==2.6.0",
+
+  # --- Scientific stack ---
+  "numpy==2.4.0",
+  "scipy==1.16.3",
+  "pandas==2.3.3",
+  "scikit-learn==1.8.0",
+  "matplotlib==3.10.8",
+
+  # --- common dev utilities (추천) ---
+  "tqdm>=4.66",
+  "pyyaml>=6.0",
+  "rich>=13.7",
+  "tensorboard>=2.16",
+  "h5py>=3.11",
+]
+
+# torch/vision/audio는 PyTorch 전용 인덱스에서만 가져오게 "핀"을 박음
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu128", marker = "sys_platform == 'win32' or sys_platform == 'linux'" }]
+torchvision = [{ index = "pytorch-cu128", marker = "sys_platform == 'win32' or sys_platform == 'linux'" }]
+torchaudio = [{ index = "pytorch-cu128", marker = "sys_platform == 'win32' or sys_platform == 'linux'" }]
+
+# PyTorch CUDA 12.8 wheel index
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true

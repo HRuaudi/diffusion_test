@@ -1,0 +1,62 @@
+# Conditional Diffusion Model - Base Configuration
+# 이 파일을 복사해서 experiments/ 폴더에 실험별 config 생성
+
+# ===== 데이터 설정 =====
+data:
+  hdf5_path: data/raw/tspred_v2_new.h5
+  scenarios: null  # null이면 전체, ['FirstData', 'PSV'] 형태로 지정
+  input_dim: 24
+  output_dim: 9
+  max_seq_len: 5130
+  train_ratio: 0.8
+  val_ratio: 0.1
+  test_ratio: 0.1
+  batch_size: 32
+  num_workers: 4
+
+# ===== 모델 설정 =====
+model:
+  name: conditional_diffusion
+  # Diffusion
+  timesteps: 1000
+  beta_schedule: linear  # linear, cosine, sigmoid
+  beta_start: 0.0001
+  beta_end: 0.02
+  # UNet backbone
+  unet:
+    channels: [64, 128, 256, 512]
+    attention_resolutions: [16, 8]
+    num_res_blocks: 2
+    dropout: 0.1
+  # Conditioner
+  conditioner:
+    type: mlp  # mlp, transformer, tcn
+    hidden_dim: 256
+    num_layers: 3
+
+# ===== 학습 설정 =====
+training:
+  max_epochs: 100
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-5
+  lr_scheduler: cosine  # cosine, step, none
+  warmup_epochs: 5
+  gradient_clip_val: 1.0
+  ema_decay: 0.9999  # Exponential Moving Average
+
+# ===== 로깅/체크포인트 =====
+logging:
+  log_every_n_steps: 50
+  val_check_interval: 1.0
+  save_top_k: 3
+  monitor: val_loss
+  mode: min
+
+# ===== 하드웨어 =====
+hardware:
+  accelerator: gpu
+  devices: 1
+  precision: 16-mixed  # 32, 16-mixed, bf16-mixed
+
+# ===== 재현성 =====
+seed: 42

@@ -1,0 +1,60 @@
+# ===== Vibe Coding - AI 생성 임시 코드 =====
+sandbox/
+
+# ===== 실험 결과 (용량 큼) =====
+experiments/
+*.ckpt
+lightning_logs/
+
+# ===== 데이터 =====
+data/raw/*.h5
+data/processed/
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ===== 가상환경 =====
+.venv/
+venv/
+ENV/
+
+# ===== PyCharm (.idea 부분 추적) =====
+.idea/*
+!.idea/runConfigurations/
+!.idea/inspectionProfiles/
+
+# ===== VSCode =====
+.vscode/
+
+# ===== Jupyter =====
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ===== 임시 파일 =====
+tmp/
+*.tmp
+*.log
+*.bak
+
+# ===== OS 생성 파일 =====
+.DS_Store
+Thumbs.db
