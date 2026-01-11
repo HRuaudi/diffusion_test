@@ -10,11 +10,14 @@ Conditional Diffusion Model로 시계열 생성 (Bifurcation 분석)
 | 파일 | 설명 |
 |------|------|
 | `data/raw/tspred_v2_new.h5` | 원본 데이터 (6.1GB, 34,774건) |
-| `data/processed/tspred_v2_cleaned.h5` | **학습용 데이터** - 중복 제거, 1000→72 변환 (34,586건) |
+| `data/processed/tspred_v2_cleaned.h5` | 전처리 완료 - 중복 제거, 1000→72 변환 (34,586건) |
+| `data/processed/tspred_v2_normalized.h5` | **학습용** - 정규화 완료, [0,1] 범위 |
 | `scripts/preprocess_h5.py` | 전처리 스크립트 (중복 제거 + 특수값 변환) |
 | `scripts/normalize.py` | 정규화/역정규화 함수 (물리량별 통일) |
+| `scripts/create_normalized_h5.py` | 정규화된 H5 파일 생성 |
 
-**주의**: 학습에는 반드시 `tspred_v2_cleaned.h5` 사용
+**학습**: `tspred_v2_normalized.h5` 사용 (속도 빠름)
+**분석**: `tspred_v2_cleaned.h5` 사용 (원본 물리값)
 
 ## 2. 모델 구조 (추후 결정)
 ```
