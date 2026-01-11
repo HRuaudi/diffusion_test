@@ -42,8 +42,16 @@ class DiffusionDataset(Dataset):
         max_len=None,
         split=None,
         split_ratio=(0.8, 0.1, 0.1),
+        sample_size=None,
         seed=42
     ):
+        """
+        Parameters
+        ----------
+        sample_size : int, optional
+            전체 데이터에서 사용할 샘플 수 (개발/디버깅용)
+            None이면 전체 사용
+        """
         self.h5_path = h5_path
         self.max_len = max_len
 
@@ -61,6 +69,12 @@ class DiffusionDataset(Dataset):
                     case_ids = list(hf[scenario].keys())
                     for case_id in case_ids:
                         self.samples.append((scenario, case_id))
+
+        # 샘플 크기 제한 (split 전에 적용)
+        np.random.seed(seed)
+        if sample_size is not None and sample_size < len(self.samples):
+            indices = np.random.choice(len(self.samples), sample_size, replace=False)
+            self.samples = [self.samples[i] for i in indices]
 
         # Train/Val/Test 분할
         if split is not None:
@@ -170,12 +184,19 @@ def create_dataloaders(
     h5_path=DATA_PATH,
     batch_size=32,
     max_len=None,
+    sample_size=None,
     num_workers=0,
     split_ratio=(0.8, 0.1, 0.1),
     seed=42
 ):
     """
     Train/Val/Test DataLoader 생성
+
+    Parameters
+    ----------
+    sample_size : int, optional
+        전체 데이터에서 사용할 샘플 수 (개발/디버깅용)
+        예: sample_size=1000 → train 800, val 100, test 100
 
     Returns
     -------
@@ -186,6 +207,7 @@ def create_dataloaders(
         max_len=max_len,
         split='train',
         split_ratio=split_ratio,
+        sample_size=sample_size,
         seed=seed
     )
 
@@ -194,6 +216,7 @@ def create_dataloaders(
         max_len=max_len,
         split='val',
         split_ratio=split_ratio,
+        sample_size=sample_size,
         seed=seed
     )
 
@@ -202,6 +225,7 @@ def create_dataloaders(
         max_len=max_len,
         split='test',
         split_ratio=split_ratio,
+        sample_size=sample_size,
         seed=seed
     )
 
@@ -272,16 +296,18 @@ if __name__ == "__main__":
     print(f"   min: {lengths.min()}, max: {lengths.max()}")
     print(f"   mean: {lengths.mean():.1f}, std: {lengths.std():.1f}")
 
-    # 3. DataLoader 테스트 (고정 길이)
-    print("\n[3] DataLoader 테스트 (max_len=512)")
+    # 3. DataLoader 테스트 (고정 길이 + 샘플 제한)
+    print("\n[3] DataLoader 테스트 (max_len=512, sample_size=1000)")
     train_loader, val_loader, test_loader = create_dataloaders(
         batch_size=16,
-        max_len=512
+        max_len=512,
+        sample_size=1000
     )
 
+    print(f"   Train samples: {len(train_loader.dataset)}")
+    print(f"   Val samples: {len(val_loader.dataset)}")
+    print(f"   Test samples: {len(test_loader.dataset)}")
     print(f"   Train batches: {len(train_loader)}")
-    print(f"   Val batches: {len(val_loader)}")
-    print(f"   Test batches: {len(test_loader)}")
 
     # 첫 배치 확인
     batch = next(iter(train_loader))
