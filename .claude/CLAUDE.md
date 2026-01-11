@@ -4,7 +4,17 @@
 Conditional Diffusion Model로 시계열 생성 (Bifurcation 분석)
 - 입력(condition): 24D 벡터 (사고 조건)
 - 출력: (T, 9) 시계열 (물리량 변화)
-- 데이터: D:\Diffusion_test\data\raw\tspred_v2_new.h5
+- 데이터: `data/processed/tspred_v2_cleaned.h5` (전처리 완료)
+
+## 1.1 데이터 및 스크립트 파일
+| 파일 | 설명 |
+|------|------|
+| `data/raw/tspred_v2_new.h5` | 원본 데이터 (6.1GB, 34,774건) |
+| `data/processed/tspred_v2_cleaned.h5` | **학습용 데이터** - 중복 제거, 1000→72 변환 (34,586건) |
+| `scripts/preprocess_h5.py` | 전처리 스크립트 (중복 제거 + 특수값 변환) |
+| `scripts/normalize.py` | 정규화/역정규화 함수 (물리량별 통일) |
+
+**주의**: 학습에는 반드시 `tspred_v2_cleaned.h5` 사용
 
 ## 2. 모델 구조 (추후 결정)
 ```
@@ -31,7 +41,7 @@ condition (24D) ──► Denoiser ──► iterative denoise ──► y_hat (
 ```python
 # 모든 스크립트 상단에 이 경로들 사용
 PROJECT_ROOT = r"D:\Diffusion_test"
-DATA_PATH = r"D:\Diffusion_test\data\raw\tspred_v2_new.h5"
+DATA_PATH = r"D:\Diffusion_test\data\processed\tspred_v2_cleaned.h5"  # 전처리 완료 데이터
 SANDBOX_PATH = r"D:\Diffusion_test\sandbox\claude"  # + 날짜
 ```
 
@@ -40,8 +50,9 @@ SANDBOX_PATH = r"D:\Diffusion_test\sandbox\claude"  # + 날짜
 # 01_load_data.py - HDF5 로드 테스트
 import h5py
 import numpy as np
+from scripts.normalize import normalize_input, normalize_output
 
-DATA_PATH = r"D:\Diffusion_test\data\raw\tspred_v2_new.h5"
+DATA_PATH = r"D:\Diffusion_test\data\processed\tspred_v2_cleaned.h5"
 
 with h5py.File(DATA_PATH, 'r') as hf:
     scenarios = [k for k in hf.keys() if not k.startswith('_')]
@@ -49,8 +60,10 @@ with h5py.File(DATA_PATH, 'r') as hf:
 
     x = hf['FirstData']['1']['input'][:]   # (24,)
     y = hf['FirstData']['1']['output'][:]  # (T, 9)
-    print(f"input shape: {x.shape}")
-    print(f"output shape: {y.shape}")
+
+    # 정규화 적용
+    x_norm = normalize_input(x)   # (47,)
+    y_norm = normalize_output(y)  # (T, 9) - [0, 1] 범위
 ```
 
 ## 4. 실험 로그 (필수)
