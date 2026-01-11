@@ -15,6 +15,7 @@ Conditional Diffusion Model로 시계열 생성 (Bifurcation 분석)
 | `scripts/preprocess_h5.py` | 전처리 스크립트 (중복 제거 + 특수값 변환) |
 | `scripts/normalize.py` | 정규화/역정규화 함수 (물리량별 통일) |
 | `scripts/create_normalized_h5.py` | 정규화된 H5 파일 생성 |
+| `scripts/dataloader.py` | PyTorch DataLoader (train/val/test 분할) |
 
 **학습**: `tspred_v2_normalized.h5` 사용 (속도 빠름)
 **분석**: `tspred_v2_cleaned.h5` 사용 (원본 물리값)

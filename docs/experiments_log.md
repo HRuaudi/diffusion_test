@@ -312,3 +312,83 @@
 - 역정규화 오차: < 0.0001%
 - 정규화 범위: [-0.04, 1.0] (일부 온도가 min 이하)
 ---
+---
+## 2026-01-11 - DataLoader 구현 [claude-session004]
+
+### 작업 내용
+- Agent: claude
+- Session: 004
+- PyTorch DataLoader 구현 (train/val/test 분할)
+- 가변 길이 시계열 처리 (패딩 + 마스크)
+
+### 생성 스크립트
+- `scripts/dataloader.py`
+
+### 기대 효과
+- 확인사항: 배치 로딩 및 train/val/test 분할 정상 작동
+- 목표: Diffusion 모델 학습 파이프라인 구축
+- 배경: 정규화된 H5 파일에서 효율적 데이터 로딩 필요
+
+### 결과
+| 항목 | 값 |
+|------|-----|
+| Train 샘플 | 27,668 (80%) |
+| Val 샘플 | 3,459 (10%) |
+| Test 샘플 | 3,459 (10%) |
+| 시계열 길이 | 5,076~5,183 (mean: 5,157) |
+
+### 주요 기능
+1. **DiffusionDataset**: H5에서 데이터 로드
+2. **collate_variable_length**: 가변 길이 배치 처리 (패딩 + 마스크)
+3. **create_dataloaders**: train/val/test 분할 DataLoader 생성
+
+### 사용 예시
+```python
+from scripts.dataloader import create_dataloaders
+
+# 고정 길이 (max_len=512)
+train_loader, val_loader, test_loader = create_dataloaders(
+    batch_size=32,
+    max_len=512
+)
+
+# 가변 길이 (마스크 포함)
+train_loader, val_loader, test_loader = create_dataloaders(
+    batch_size=16,
+    max_len=None
+)
+```
+
+### 다음 단계
+- Diffusion forward process 구현
+- Beta schedule 정의
+---
+---
+## 2026-01-11 - cleaned H5(raw 대비) 차이 분석 [codex-session002]
+
+### 작업 내용
+- Agent: codex
+- Session: 002
+- raw(tspred_v2_new.h5) vs cleaned(tspred_v2_cleaned.h5) 구조/통계 비교
+- 입력 특수값(-1/1000) 및 출력 범위/길이 분포 비교
+- raw 전체에서 시나리오 간 중복 입력(24D) 여부 확인
+
+### 기대 효과
+- 확인사항: cleaned 파일이 어떤 규칙으로 값/케이스를 변경했는지 파악
+- 목표: 동일 조건/전처리 기준 정리
+- 배경: data/processed에 신규 cleaned 파일 생성됨
+
+### 결과
+- 메타데이터: raw는 _index 존재, cleaned는 _index 없음
+- 케이스 수: raw 34,774 → cleaned 34,586 (FirstData 9,860 동일, PSV -1, SBO -187, SDS/Seal 동일)
+- 입력 1000 특수값 제거: dim01-07,09,11,13,19에서 1000 → 72로 변환되어 clean의 1000 count=0
+- dim07 상수값: raw 1000 고정 → clean 72 고정
+- -1 특수값 카운트는 removed 케이스 수만큼 감소
+- 출력 범위/NaN/Inf: raw vs clean 동일(차이 없음), NaN/Inf=0
+- 출력 길이 분포: T 길이 종류 145개 동일, 최빈 길이 5,177 유지
+- raw 전체 중복 입력(24D) 188개는 모두 시나리오 간 중복: FirstData 188, SBO 187, PSV 1
+
+### 다음 단계
+- cleaned 생성 파이프라인(전처리 스크립트)에서 1000→72 변환 근거 확인
+- cleaned에서 제외된 SBO/PSV 케이스의 원인(중복/결측) 확인
+---
