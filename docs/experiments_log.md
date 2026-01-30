@@ -392,3 +392,55 @@ train_loader, val_loader, test_loader = create_dataloaders(
 - cleaned 생성 파이프라인(전처리 스크립트)에서 1000→72 변환 근거 확인
 - cleaned에서 제외된 SBO/PSV 케이스의 원인(중복/결측) 확인
 ---
+---
+## 2026-01-30 - Diffusion 모델 기초 구현 [claude-session005]
+
+### 작업 내용
+- Agent: claude
+- Session: 005
+- Phase 5 착수: Diffusion forward process, Denoiser, Training loop 구현
+- Mock 데이터로 파이프라인 검증
+
+### 생성 스크립트
+| 파일 | 설명 |
+|------|------|
+| `scripts/diffusion.py` | GaussianDiffusion 클래스 (forward process, beta schedule, sampling) |
+| `scripts/model.py` | MLPDenoiser, ConvDenoiser 모델 |
+| `scripts/train.py` | Training loop (main, quick_test) |
+| `scripts/test_pipeline.py` | Mock 데이터 파이프라인 검증 |
+
+### 기대 효과
+- 확인사항: Diffusion 파이프라인 정상 작동 여부
+- 목표: Phase 5 완료, 실제 데이터 학습 준비
+- 배경: Phase 1-4 완료 후 핵심 모델 구현 지연됨
+
+### 결과
+
+#### 1. Diffusion Forward Process
+- Beta schedule: linear, cosine 지원
+- q_sample: x_t = sqrt(α_cumprod) * x_0 + sqrt(1-α_cumprod) * noise
+- Timesteps: 1000 (full), 100 (quick test)
+
+#### 2. Denoiser Models
+| 모델 | Parameters | 특징 |
+|------|------------|------|
+| MLPDenoiser | ~2.4M | 단순, 빠름 |
+| ConvDenoiser | ~116K | 1D Conv + Residual, 시계열 적합 |
+
+#### 3. Training Pipeline Test (Mock Data)
+```
+Epochs: 5
+Train Loss: 1.028 → 0.208
+Val Loss: 0.762 → 0.201
+Generation: 4 samples in 0.41s
+```
+
+#### 4. 확인된 이슈
+- 생성 값 범위 발산 (학습 부족)
+- 실제 H5 데이터 파일 미존재 (로컬 환경 필요)
+
+### 다음 단계
+- 실제 H5 데이터로 학습 실행
+- Hyperparameter 튜닝 (hidden_dim, n_layers, lr)
+- 생성 품질 평가 메트릭 추가 (MSE, MAE, 시각화)
+---
